@@ -41,7 +41,7 @@ def retriever_tool(query:str,top_k:int):
         Settings.embed_model = GoogleGenAIEmbedding(model_name="gemini-embedding-001",api_key=my_logging.find_one({"name_api":"GEMINI_API_KEY"}).get("api_key"),embed_batch_size=6)
         qdrant_store = QdrantVectorStore(
             client=client,
-            collection_name="rag_chat_system"
+            collection_name="chunks_data"
         )
 
         index = VectorStoreIndex.from_vector_store(qdrant_store)
@@ -106,7 +106,7 @@ def logging_api(log:logging):
 def deleteon():
     
 
-    client.delete_collection(collection_name="rag_chat_system")
+    client.delete_collection(collection_name="chunks_data")
     return(f"collection is delete")
     
 
@@ -129,7 +129,7 @@ def splitter_doc(file: UploadFile = File(...)):
     
     embed_model = GoogleGenAIEmbedding(model_name="gemini-embedding-001",api_key=my_logging.find_one({"name_api":"GEMINI_API_KEY"}).get("api_key"),embed_batch_size=6)
 
-    qdrant_store = QdrantVectorStore(client=client,collection_name="rag_chat_system")
+    qdrant_store = QdrantVectorStore(client=client,collection_name="chunks_data")
     storage_context1 = StorageContext.from_defaults(vector_store=qdrant_store)
     VectorStoreIndex.from_documents(
     split_docs,
@@ -205,35 +205,45 @@ def query(query:str):
     function_handlers = {"retriever_text":retriever_tool}
     print(function_handlers)
     # print("---------------------function handlears -----------------------------")
+    while True:
+        parts = response.candidates[0].content.parts
 
-    if response.candidates[0].content.parts[0].function_call:
-        fc = response.candidates[0].content.parts[0].function_call
-        result = function_handlers[fc.name](**dict(fc.args))
-        print(type(result))
-        
-        
-        chat_response = chat.send_message(
-                 content_types.to_content({
+    # Collect all function calls in this turn
+        function_calls = [p.function_call for p in parts if getattr(p, "function_call", None)]
+
+        if function_calls:
+            function_responses = []
+            for fc in function_calls:
+                # execute the function
+                result = function_handlers[fc.name](**dict(fc.args))
+                
+                function_responses.append({
+                    "function_response": {
+                        "name": fc.name,
+                        "response": result
+                    }
+                })
+
+            # Send ALL function responses back at once
+            chat_response = chat.send_message(
+                content_types.to_content({
                     "role": "function",
-                    "parts": [{
-                        "function_response": {
-                            "name": fc.name,
-                            "response": result
-                        }
-                    }]
+                    "parts": function_responses
                 })
             )
-            
-        response_text = chat_response.text
-        save_to_history(query, response_text)
-        return response_text
 
-    else:
-        response_text = response.text
-        save_to_history(query,response_text)
+            response_text = chat_response.text
+            save_to_history(query, response_text)
+            return response_text
 
-        return response_text   
+        else:
+            # No function call → just return text
+            response_text = response.text
+            save_to_history(query, response_text)
+            return response_text
+
         
+            
         
     
 
