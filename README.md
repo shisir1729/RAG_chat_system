@@ -72,6 +72,8 @@ cd RAG_chat_system
 
 ```bash
 uv add <packages>
+or 
+uv add -r requiremnts.txt
 ```
 
 ### 3️⃣ Configure environment
