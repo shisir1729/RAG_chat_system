@@ -71,7 +71,7 @@ cd RAG_chat_system
 ### 2️⃣ Install dependencies
 
 ```bash
-pip install -r requirements.txt
+uv add <packages>
 ```
 
 ### 3️⃣ Configure environment
@@ -86,13 +86,13 @@ MONGO_URI = "your_mongodb_connection_string"
 ### 4️⃣ Start the backend
 
 ```bash
-uvicorn main:app --reload
+ uv run uvicorn main:app --reload
 ```
 
 ### 5️⃣ Run the frontend
 
 ```bash
-streamlit run streamlit_learning.py
+ uvx streamlit run streamlit_learning.py
 ```
 
 Now open the Streamlit app (default: `http://localhost:8501`) and start chatting!
@@ -106,7 +106,7 @@ RAG_chat_system/
 ├── main.py                 # Core FastAPI backend
 ├── configuration.py        # Qdrant and MongoDB configurations
 ├── streamlit_learning.py   # Streamlit frontend
-├── requirements.txt        # Python dependencies
+├── pyproject.toml          # Python dependencies
 └── README.md               # Project documentation
 ```
 
@@ -133,14 +133,8 @@ RAG_chat_system/
 | Vector Database | Qdrant                 |
 | Database        | MongoDB                |
 
----
 
-## 💡 Future Improvements
 
-* Add authentication for user sessions
-* Implement document management from UI
-* Improve chunking and metadata search
-* Deploy using Docker and Cloud services
 
 ---
 
