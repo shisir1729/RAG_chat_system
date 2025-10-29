@@ -8,11 +8,6 @@ class Document(BaseModel):
     document_type:str
     data_create:datetime
 
-
-
-
-
-
 class logging(BaseModel):
     api_name:str
     api_key:str
