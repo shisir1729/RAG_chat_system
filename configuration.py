@@ -15,4 +15,3 @@ client = QdrantClient(url="https://2499f1af-a621-474e-9ebc-82a4fbd88b14.eu-west-
                       api_key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.8wbxLG5fw36E6bZIlwrZEdI8VzKy-njrS7zzGs75vok",timeout=30)
 
 api = my_logging.find_one({"name_api":"GEMINI_API_KEY"}).get("api_key")
-print(api)
