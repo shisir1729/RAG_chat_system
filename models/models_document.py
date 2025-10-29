@@ -11,6 +11,10 @@ class Document(BaseModel):
 
 
 
+class Splitter(BaseModel):
+    chunk_size:int =512
+    chunk_overlap:int=50
+    includ_metadata : bool=True
 
 
 class logging(BaseModel):
